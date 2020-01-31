@@ -98,6 +98,24 @@ struct CarState {
   errorsDEPRECATED @0 :List(CarEvent.EventName);
   events @13 :List(CarEvent);
 
+  # Bosch lane polynomials
+  lPoly @32 :BoschPoly;
+  rPoly @33 :BoschPoly;
+  lAdjPoly @34 :BoschPoly;
+  rAdjPoly @35 :BoschPoly;
+
+  struct BoschPoly {
+    # Bosch lane polynomial coefficients
+    c3 @0 :Float32;
+    c2 @1 :Float32;
+    c1 @2 :Float32;
+    c0 @3 :Float32;
+    prob @4 :Float32;
+    distVis @5 :Float32;
+    isSolid @6 :Bool;
+    isDashed @7 :Bool;
+  }
+
   # car speed
   vEgo @1 :Float32;         # best estimate of speed
   aEgo @16 :Float32;        # best estimate of acceleration
