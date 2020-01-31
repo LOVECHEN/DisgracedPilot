@@ -52,3 +52,4 @@ panda_jungle
 .coverage*
 htmlcov
 
+/.vs
