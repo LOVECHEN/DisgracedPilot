@@ -114,15 +114,15 @@ def data_sample(CI, CC, sm, can_sock, driver_status, state, mismatch_counter, pa
   cal_perc = sm['liveCalibration'].calPerc
 
   cal_rpy = [0,0,0]
-  if cal_status != Calibration.CALIBRATED:
-    if cal_status == Calibration.UNCALIBRATED:
-      events.append(create_event('calibrationIncomplete', [ET.NO_ENTRY, ET.SOFT_DISABLE, ET.PERMANENT]))
-    else:
-      events.append(create_event('calibrationInvalid', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-  else:
-    rpy = sm['liveCalibration'].rpyCalib
-    if len(rpy) == 3:
-      cal_rpy = rpy
+  #if cal_status != Calibration.CALIBRATED:
+  #  if cal_status == Calibration.UNCALIBRATED:
+  #    events.append(create_event('calibrationIncomplete', [ET.NO_ENTRY, ET.SOFT_DISABLE, ET.PERMANENT]))
+  #  else:
+  #    events.append(create_event('calibrationInvalid', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
+  #else:
+  #  rpy = sm['liveCalibration'].rpyCalib
+  #  if len(rpy) == 3:
+  #    cal_rpy = rpy
 
   # When the panda and controlsd do not agree on controls_allowed
   # we want to disengage openpilot. However the status from the panda goes through
@@ -563,14 +563,14 @@ def controlsd_thread(sm=None, pm=None, can_sock=None):
     # Create alerts
     if not sm.all_alive_and_valid():
       events.append(create_event('commIssue', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
-    if not sm['pathPlan'].mpcSolutionValid:
-      events.append(create_event('plannerError', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
-    if not sm['pathPlan'].sensorValid:
-      events.append(create_event('sensorDataInvalid', [ET.NO_ENTRY, ET.PERMANENT]))
-    if not sm['pathPlan'].paramsValid:
-      events.append(create_event('vehicleModelInvalid', [ET.WARNING]))
-    if not sm['pathPlan'].posenetValid:
-      events.append(create_event('posenetInvalid', [ET.NO_ENTRY, ET.WARNING]))
+    #if not sm['pathPlan'].mpcSolutionValid:
+    #  events.append(create_event('plannerError', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE]))
+    #if not sm['pathPlan'].sensorValid:
+    #  events.append(create_event('sensorDataInvalid', [ET.NO_ENTRY, ET.PERMANENT]))
+    #if not sm['pathPlan'].paramsValid:
+    #  events.append(create_event('vehicleModelInvalid', [ET.WARNING]))
+    #if not sm['pathPlan'].posenetValid:
+    #  events.append(create_event('posenetInvalid', [ET.NO_ENTRY, ET.WARNING]))
     if not sm['plan'].radarValid:
       events.append(create_event('radarFault', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
     if sm['plan'].radarCanError:

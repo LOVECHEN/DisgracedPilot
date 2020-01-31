@@ -2,7 +2,7 @@ from common.numpy_fast import interp
 import numpy as np
 from cereal import log
 
-CAMERA_OFFSET = 0.06  # m from center car to camera
+CAMERA_OFFSET = 0  # m from center car to camera
 
 def compute_path_pinv(l=50):
   deg = 3
@@ -53,17 +53,13 @@ class LanePlanner():
     self._path_pinv = compute_path_pinv()
     self.x_points = np.arange(50)
 
-  def parse_model(self, md):
-    if len(md.leftLane.poly):
-      self.l_poly = np.array(md.leftLane.poly)
-      self.r_poly = np.array(md.rightLane.poly)
-      self.p_poly = np.array(md.path.poly)
-    else:
-      self.l_poly = model_polyfit(md.leftLane.points, self._path_pinv)  # left line
-      self.r_poly = model_polyfit(md.rightLane.points, self._path_pinv)  # right line
-      self.p_poly = model_polyfit(md.path.points, self._path_pinv)  # predicted path
-    self.l_prob = md.leftLane.prob  # left line prob
-    self.r_prob = md.rightLane.prob  # right line prob
+  def parse_model(self, md, cs):
+    # pass in the carState to extract Bosch lane polynomials and insert them in place of the OP model lane polynomials
+    self.l_poly = np.array([cs.lPoly.c0,cs.lPoly.c1,cs.lPoly.c2,cs.lPoly.c3])
+    self.r_poly = np.array([cs.rPoly.c0,cs.rPoly.c1,cs.rPoly.c2,cs.rPoly.c3])
+    self.p_poly = [.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))] # take the middle of the lane lines as the desired path
+    self.l_prob = cs.lPoly.prob
+    self.r_prob = cs.rPoly.prob
 
     if len(md.meta.desirePrediction):
       self.l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]

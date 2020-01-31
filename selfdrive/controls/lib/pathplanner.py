@@ -83,7 +83,7 @@ class PathPlanner():
     VM.update_params(sm['liveParameters'].stiffnessFactor, sm['liveParameters'].steerRatio)
     curvature_factor = VM.curvature_factor(v_ego)
 
-    self.LP.parse_model(sm['model'])
+    self.LP.parse_model(sm['model'], sm['carState'])
 
     # Lane change logic
     lane_change_direction = LaneChangeDirection.none
