@@ -57,7 +57,7 @@ class LanePlanner():
     # pass in the carState to extract Bosch lane polynomials and insert them in place of the OP model lane polynomials
     self.l_poly = np.array([cs.lPoly.c0,cs.lPoly.c1,cs.lPoly.c2,cs.lPoly.c3])
     self.r_poly = np.array([cs.rPoly.c0,cs.rPoly.c1,cs.rPoly.c2,cs.rPoly.c3])
-    self.p_poly = [.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))] # take the middle of the lane lines as the desired path
+    self.p_poly = np.array([.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))]) # take the middle of the lane lines as the desired path
     self.l_prob = cs.lPoly.prob
     self.r_prob = cs.rPoly.prob
 
