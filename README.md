@@ -7,7 +7,9 @@ NO WARRANTY EXPRESSED OR IMPLIED.**
 The 'DisgracedPilot' Fork
 ------
 
-This is an experimental OpenPilot build that uses the Accord-Bosch camera system to provide lane detection instead of OpenPilot. It is for research purposes only and absolutely not for use in daily driving. Its purpose is simply to prove that the vehicle can be controlled directly using the Bosch data from the CAN in the path / lane planner, and that the EON may be left in storage during operation. As such, absolutely no user support will be given. **ABUSE OF THIS SOFTWARE MAY RESULT IN INJURY OR DEATH.** 
+This is an experimental OpenPilot fork that uses the Accord-Bosch camera system to provide lane detection. It is strictly for research purposes only. It aims to show that the vehicle can be controlled using Bosch lane guidance directly off of the CAN, made possible by carefully decoding the raw bit data and producing a custom DBC file. Absolutely no user support will be given. **IMPROPER USE OR ABUSE OF THIS SOFTWARE MAY RESULT IN PROPERTY DAMAGE, INJURY, OR DEATH. ANY APPLICATION OF THIS SOFTWARE IS AT YOUR OWN RISK.** 
+
+The system in action: https://www.youtube.com/watch?v=GB8I9_anNG4
 
 Instructions:
 
@@ -15,14 +17,28 @@ Instructions:
 * SSH into the EON and run 'scons' in the ~/openpilot folder. (May take one hour or more.)
 * Copy LiveParameters from another fork into the ~/data/params folder.
 
+Known Limitations:
+
+ * There are innumerable unknown limitations, behaviours, and interactions that can and will adversely affect system performance.
+ * No handling of loss of one or both lane lines. System may be unpredictable in this scenario.
+ * No handling of lane changes. System tries to return to the centre of the original lane until the lane lines are passed.
+ * Steep turns close to the Accord EPS torque limit have unpredictable performance.
+ * Controls have not been tuned, resulting in occasional lateral oscillation or overly-aggressive steering.
+
 To do:
 
 * More accurately determine the decoding of the Bosch lane polynomial messages. Particularly need to understand the "LINE_JERK" parameter, as it seems inaccurate or misnamed. Other flags like line colour or slope seem to be present but need to be identified.
 * Identify the coordinate frame of the Bosch camera. It may be referenced to the rear axle of the vehicle, instead of the camera centre in OpenPilot. The impact may be minimal, however.
-* Investigate model deficiencies, e.g. moving from light into shadow.
-* Tune the controls.
-* Handle common freeway lane occurrences like lane merging, lane ending.
-* Consider new functionality, e.g. using the outer lane tracking to create a lane change assistance model, implementing navigation coasting to pass through intersections or deal with brief lane line dropouts.
+* Investigate model features and deficiencies, e.g. moving from light into shadow, detection of non-line lane boundaries like curbs or grass.
+* Handle common freeway features like lane merging + ending and freeway exits.
+* Tune the controls and other new logic parameters.
+* Re-purpose various vision and control warnings to be based on the Bosch lane outputs.
+* Lightly smooth lane probabilities to reduce drive path jitter.
+* Show lane and diagnostic information on the UI.
+* Use adjacent lane lines to potentially improve or stabilise lane guidance.
+* Consider new functionality, e.g. using the adjacent lane tracking to create a lane change assistance function; implementing navigation coasting to pass through intersections or deal with brief lane line dropouts; new parameter learner like camera offset.
 * Determine which OpenPilot processes can be disabled and cleanly remove or ignore them.
+* Investigate running this fork on a Raspberry Pi 4. 
+* Push any universal features to the main line OpenPilot.
 
 Please contact me if you are interested in contributing to any of these points.
