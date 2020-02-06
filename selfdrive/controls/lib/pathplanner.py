@@ -12,7 +12,7 @@ from cereal import log
 LaneChangeState = log.PathPlan.LaneChangeState
 LaneChangeDirection = log.PathPlan.LaneChangeDirection
 
-LOG_MPC = os.environ.get('LOG_MPC', False)
+LOG_MPC = True
 
 DESIRES = {
   LaneChangeDirection.none: {
@@ -164,7 +164,7 @@ class PathPlanner():
                         self.LP.l_prob, self.LP.r_prob, curvature_factor, v_ego_mpc, self.LP.lane_width)
 
     # reset to current steer angle if not active or overriding
-    if active:
+    if active and self.LP.lanes_valid:
       delta_desired = self.mpc_solution[0].delta[1]
       rate_desired = math.degrees(self.mpc_solution[0].rate[0] * VM.sR)
     else:
@@ -208,7 +208,7 @@ class PathPlanner():
     plan_send.pathPlan.mpcSolutionValid = bool(plan_solution_valid)
     plan_send.pathPlan.paramsValid = bool(sm['liveParameters'].valid)
     plan_send.pathPlan.sensorValid = bool(sm['liveParameters'].sensorValid)
-    plan_send.pathPlan.posenetValid = bool(sm['liveParameters'].posenetValid)
+    plan_send.pathPlan.posenetValid = bool(self.LP.lanes_valid)
 
     plan_send.pathPlan.desire = desire
     plan_send.pathPlan.laneChangeState = self.lane_change_state

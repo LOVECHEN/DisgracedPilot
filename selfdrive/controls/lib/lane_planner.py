@@ -53,6 +53,8 @@ class LanePlanner():
     self._path_pinv = compute_path_pinv()
     self.x_points = np.arange(50)
 
+    self.lanes_valid = False
+
   def parse_model(self, md, cs):
     # pass in the carState to extract Bosch lane polynomials and insert them in place of the OP model lane polynomials
     self.l_poly = np.array([cs.lPoly.c0,cs.lPoly.c1,cs.lPoly.c2,cs.lPoly.c3])
@@ -66,6 +68,12 @@ class LanePlanner():
       self.r_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeRight - 1]
 
   def update_d_poly(self, v_ego):
+    # set lanes valid flag
+    if self.l_prob < .10 and self.r_prob < .10:
+      self.lanes_valid = False
+    else:
+      self.lanes_valid = True
+
     # only offset left and right lane lines; offsetting p_poly does not make sense
     self.l_poly[3] += CAMERA_OFFSET
     self.r_poly[3] += CAMERA_OFFSET
