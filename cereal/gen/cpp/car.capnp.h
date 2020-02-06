@@ -86,6 +86,7 @@ enum class EventName_baa8c5d505f727de: uint16_t {
 };
 CAPNP_DECLARE_ENUM(EventName, baa8c5d505f727de);
 CAPNP_DECLARE_SCHEMA(9da4fa09e052903c);
+CAPNP_DECLARE_SCHEMA(90bbed2427613a7e);
 CAPNP_DECLARE_SCHEMA(991a37a6155935a3);
 CAPNP_DECLARE_SCHEMA(e64e81478e6e60af);
 CAPNP_DECLARE_SCHEMA(e004ca45136f6a89);
@@ -237,6 +238,7 @@ struct CarState {
   class Reader;
   class Builder;
   class Pipeline;
+  struct BoschPoly;
   struct WheelSpeeds;
   struct CruiseState;
   typedef ::capnp::schemas::GearShifter_e004ca45136f6a89 GearShifter;
@@ -244,7 +246,22 @@ struct CarState {
   struct ButtonEvent;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(9da4fa09e052903c, 6, 6)
+    CAPNP_DECLARE_STRUCT_HEADER(9da4fa09e052903c, 6, 10)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
+struct CarState::BoschPoly {
+  BoschPoly() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(90bbed2427613a7e, 4, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -727,6 +744,18 @@ public:
 
   inline bool getStockFcw() const;
 
+  inline bool hasLPoly() const;
+  inline  ::cereal::CarState::BoschPoly::Reader getLPoly() const;
+
+  inline bool hasRPoly() const;
+  inline  ::cereal::CarState::BoschPoly::Reader getRPoly() const;
+
+  inline bool hasLAdjPoly() const;
+  inline  ::cereal::CarState::BoschPoly::Reader getLAdjPoly() const;
+
+  inline bool hasRAdjPoly() const;
+  inline  ::cereal::CarState::BoschPoly::Reader getRAdjPoly() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -877,6 +906,34 @@ public:
   inline bool getStockFcw();
   inline void setStockFcw(bool value);
 
+  inline bool hasLPoly();
+  inline  ::cereal::CarState::BoschPoly::Builder getLPoly();
+  inline void setLPoly( ::cereal::CarState::BoschPoly::Reader value);
+  inline  ::cereal::CarState::BoschPoly::Builder initLPoly();
+  inline void adoptLPoly(::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value);
+  inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> disownLPoly();
+
+  inline bool hasRPoly();
+  inline  ::cereal::CarState::BoschPoly::Builder getRPoly();
+  inline void setRPoly( ::cereal::CarState::BoschPoly::Reader value);
+  inline  ::cereal::CarState::BoschPoly::Builder initRPoly();
+  inline void adoptRPoly(::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value);
+  inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> disownRPoly();
+
+  inline bool hasLAdjPoly();
+  inline  ::cereal::CarState::BoschPoly::Builder getLAdjPoly();
+  inline void setLAdjPoly( ::cereal::CarState::BoschPoly::Reader value);
+  inline  ::cereal::CarState::BoschPoly::Builder initLAdjPoly();
+  inline void adoptLAdjPoly(::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value);
+  inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> disownLAdjPoly();
+
+  inline bool hasRAdjPoly();
+  inline  ::cereal::CarState::BoschPoly::Builder getRAdjPoly();
+  inline void setRAdjPoly( ::cereal::CarState::BoschPoly::Reader value);
+  inline  ::cereal::CarState::BoschPoly::Builder initRAdjPoly();
+  inline void adoptRAdjPoly(::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value);
+  inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> disownRAdjPoly();
+
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -897,6 +954,121 @@ public:
 
   inline  ::cereal::CarState::WheelSpeeds::Pipeline getWheelSpeeds();
   inline  ::cereal::CarState::CruiseState::Pipeline getCruiseState();
+  inline  ::cereal::CarState::BoschPoly::Pipeline getLPoly();
+  inline  ::cereal::CarState::BoschPoly::Pipeline getRPoly();
+  inline  ::cereal::CarState::BoschPoly::Pipeline getLAdjPoly();
+  inline  ::cereal::CarState::BoschPoly::Pipeline getRAdjPoly();
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
+class CarState::BoschPoly::Reader {
+public:
+  typedef BoschPoly Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline float getC3() const;
+
+  inline float getC2() const;
+
+  inline float getC1() const;
+
+  inline float getC0() const;
+
+  inline float getProb() const;
+
+  inline float getDistVis() const;
+
+  inline bool getIsSolid() const;
+
+  inline bool getIsDashed() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class CarState::BoschPoly::Builder {
+public:
+  typedef BoschPoly Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline float getC3();
+  inline void setC3(float value);
+
+  inline float getC2();
+  inline void setC2(float value);
+
+  inline float getC1();
+  inline void setC1(float value);
+
+  inline float getC0();
+  inline void setC0(float value);
+
+  inline float getProb();
+  inline void setProb(float value);
+
+  inline float getDistVis();
+  inline void setDistVis(float value);
+
+  inline bool getIsSolid();
+  inline void setIsSolid(bool value);
+
+  inline bool getIsDashed();
+  inline void setIsDashed(bool value);
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class CarState::BoschPoly::Pipeline {
+public:
+  typedef BoschPoly Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
 private:
   ::capnp::AnyPointer::Pipeline _typeless;
   friend class ::capnp::PipelineHook;
@@ -3574,6 +3746,274 @@ inline bool CarState::Builder::getStockFcw() {
 inline void CarState::Builder::setStockFcw(bool value) {
   _builder.setDataField<bool>(
       ::capnp::bounded<78>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool CarState::Reader::hasLPoly() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+}
+inline bool CarState::Builder::hasLPoly() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+}
+inline  ::cereal::CarState::BoschPoly::Reader CarState::Reader::getLPoly() const {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_reader.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::getLPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::cereal::CarState::BoschPoly::Pipeline CarState::Pipeline::getLPoly() {
+  return  ::cereal::CarState::BoschPoly::Pipeline(_typeless.getPointerField(6));
+}
+#endif  // !CAPNP_LITE
+inline void CarState::Builder::setLPoly( ::cereal::CarState::BoschPoly::Reader value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::set(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::initLPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::init(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+inline void CarState::Builder::adoptLPoly(
+    ::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::adopt(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> CarState::Builder::disownLPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::disown(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+
+inline bool CarState::Reader::hasRPoly() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline bool CarState::Builder::hasRPoly() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline  ::cereal::CarState::BoschPoly::Reader CarState::Reader::getRPoly() const {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::getRPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::cereal::CarState::BoschPoly::Pipeline CarState::Pipeline::getRPoly() {
+  return  ::cereal::CarState::BoschPoly::Pipeline(_typeless.getPointerField(7));
+}
+#endif  // !CAPNP_LITE
+inline void CarState::Builder::setRPoly( ::cereal::CarState::BoschPoly::Reader value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::set(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::initRPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::init(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline void CarState::Builder::adoptRPoly(
+    ::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::adopt(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> CarState::Builder::disownRPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::disown(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+
+inline bool CarState::Reader::hasLAdjPoly() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+}
+inline bool CarState::Builder::hasLAdjPoly() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+}
+inline  ::cereal::CarState::BoschPoly::Reader CarState::Reader::getLAdjPoly() const {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_reader.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::getLAdjPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::cereal::CarState::BoschPoly::Pipeline CarState::Pipeline::getLAdjPoly() {
+  return  ::cereal::CarState::BoschPoly::Pipeline(_typeless.getPointerField(8));
+}
+#endif  // !CAPNP_LITE
+inline void CarState::Builder::setLAdjPoly( ::cereal::CarState::BoschPoly::Reader value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::set(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::initLAdjPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::init(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+inline void CarState::Builder::adoptLAdjPoly(
+    ::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::adopt(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> CarState::Builder::disownLAdjPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::disown(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+
+inline bool CarState::Reader::hasRAdjPoly() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+}
+inline bool CarState::Builder::hasRAdjPoly() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+}
+inline  ::cereal::CarState::BoschPoly::Reader CarState::Reader::getRAdjPoly() const {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_reader.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::getRAdjPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::get(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+#if !CAPNP_LITE
+inline  ::cereal::CarState::BoschPoly::Pipeline CarState::Pipeline::getRAdjPoly() {
+  return  ::cereal::CarState::BoschPoly::Pipeline(_typeless.getPointerField(9));
+}
+#endif  // !CAPNP_LITE
+inline void CarState::Builder::setRAdjPoly( ::cereal::CarState::BoschPoly::Reader value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::set(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
+}
+inline  ::cereal::CarState::BoschPoly::Builder CarState::Builder::initRAdjPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::init(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+inline void CarState::Builder::adoptRAdjPoly(
+    ::capnp::Orphan< ::cereal::CarState::BoschPoly>&& value) {
+  ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::adopt(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::cereal::CarState::BoschPoly> CarState::Builder::disownRAdjPoly() {
+  return ::capnp::_::PointerHelpers< ::cereal::CarState::BoschPoly>::disown(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+
+inline float CarState::BoschPoly::Reader::getC3() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline float CarState::BoschPoly::Builder::getC3() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setC3(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline float CarState::BoschPoly::Reader::getC2() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline float CarState::BoschPoly::Builder::getC2() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setC2(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline float CarState::BoschPoly::Reader::getC1() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+
+inline float CarState::BoschPoly::Builder::getC1() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setC1(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+}
+
+inline float CarState::BoschPoly::Reader::getC0() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+
+inline float CarState::BoschPoly::Builder::getC0() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setC0(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
+}
+
+inline float CarState::BoschPoly::Reader::getProb() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+}
+
+inline float CarState::BoschPoly::Builder::getProb() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setProb(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
+}
+
+inline float CarState::BoschPoly::Reader::getDistVis() const {
+  return _reader.getDataField<float>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+
+inline float CarState::BoschPoly::Builder::getDistVis() {
+  return _builder.getDataField<float>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setDistVis(float value) {
+  _builder.setDataField<float>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool CarState::BoschPoly::Reader::getIsSolid() const {
+  return _reader.getDataField<bool>(
+      ::capnp::bounded<192>() * ::capnp::ELEMENTS);
+}
+
+inline bool CarState::BoschPoly::Builder::getIsSolid() {
+  return _builder.getDataField<bool>(
+      ::capnp::bounded<192>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setIsSolid(bool value) {
+  _builder.setDataField<bool>(
+      ::capnp::bounded<192>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool CarState::BoschPoly::Reader::getIsDashed() const {
+  return _reader.getDataField<bool>(
+      ::capnp::bounded<193>() * ::capnp::ELEMENTS);
+}
+
+inline bool CarState::BoschPoly::Builder::getIsDashed() {
+  return _builder.getDataField<bool>(
+      ::capnp::bounded<193>() * ::capnp::ELEMENTS);
+}
+inline void CarState::BoschPoly::Builder::setIsDashed(bool value) {
+  _builder.setDataField<bool>(
+      ::capnp::bounded<193>() * ::capnp::ELEMENTS, value);
 }
 
 inline float CarState::WheelSpeeds::Reader::getFl() const {
