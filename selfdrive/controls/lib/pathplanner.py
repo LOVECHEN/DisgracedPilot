@@ -8,6 +8,8 @@ from selfdrive.controls.lib.lane_planner import LanePlanner
 from selfdrive.config import Conversions as CV
 import cereal.messaging as messaging
 from cereal import log
+from common.numpy_fast import interp
+from common.op_params import opParams
 
 LaneChangeState = log.PathPlan.LaneChangeState
 LaneChangeDirection = log.PathPlan.LaneChangeDirection
@@ -40,6 +42,16 @@ def calc_states_after_delay(states, v_ego, steer_angle, curvature_factor, steer_
   states[0].psi = v_ego * curvature_factor * math.radians(steer_angle) / steer_ratio * delay
   return states
 
+def compute_liveSteerRatio(op_params,angle_steers,angle_offset):
+  baseSR = op_params.get('steerRatio')
+  srBoost = op_params.get('srBoost')
+  srB0 = op_params.get('srB0')
+  srB1 = op_params.get('srB1')
+  angle_steers_corr = angle_steers - angle_offset
+
+  steerRatio = baseSR + interp(abs(angle_steers_corr),[srB0, srB1],[0, srBoost])
+
+  return steerRatio
 
 class PathPlanner():
   def __init__(self, CP):
@@ -54,6 +66,8 @@ class PathPlanner():
     self.lane_change_state = LaneChangeState.off
     self.lane_change_timer = 0.0
     self.prev_one_blinker = False
+
+    self.op_params = opParams()
 
   def setup_mpc(self):
     self.libmpc = libmpc_py.libmpc
@@ -78,9 +92,11 @@ class PathPlanner():
 
     angle_offset = sm['liveParameters'].angleOffset
 
+    liveSteerRatio = compute_liveSteerRatio(self.op_params,angle_steers,angle_offset)
+
     # Run MPC
     self.angle_steers_des_prev = self.angle_steers_des_mpc
-    VM.update_params(sm['liveParameters'].stiffnessFactor, sm['liveParameters'].steerRatio)
+    VM.update_params(sm['liveParameters'].stiffnessFactor, liveSteerRatio)
     curvature_factor = VM.curvature_factor(v_ego)
 
     self.LP.parse_model(sm['model'], sm['carState'])

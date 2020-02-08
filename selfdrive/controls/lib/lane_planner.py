@@ -1,6 +1,7 @@
 from common.numpy_fast import interp
 import numpy as np
 from cereal import log
+from common.op_params import opParams
 
 CAMERA_OFFSET = 0.  # m from center car to camera
 LANE_WIDTH_K = np.exp(-.25 / 60) # decay factor for exponential smoothing, reaches steady state in about 2*denominator seconds at 1/numerator Hz
@@ -58,6 +59,11 @@ class LanePlanner():
     self.l_prob = 0.
     self.r_prob = 0.
 
+    self.l_isSolid = False
+    self.l_isDashed = False
+    self.r_isSolid = False
+    self.r_isDashed = False
+
     self.l_lane_change_prob = 0.
     self.r_lane_change_prob = 0.
 
@@ -68,18 +74,32 @@ class LanePlanner():
 
     self.exeCtr = 0 # running counter to track times executed, mod 5
 
+    self.op_params = opParams()
+
   def parse_model(self, md, cs):
     # pass in the carState to extract Bosch lane polynomials and insert them in place of the OP model lane polynomials
-    self.l_poly = np.array([cs.lPoly.c0,cs.lPoly.c1,cs.lPoly.c2,cs.lPoly.c3])
-    self.r_poly = np.array([cs.rPoly.c0,cs.rPoly.c1,cs.rPoly.c2,cs.rPoly.c3])
+    if self.op_params.get('enable_left_lane'):
+      self.l_poly = np.array([cs.lPoly.c0,cs.lPoly.c1,cs.lPoly.c2,cs.lPoly.c3])
+      self.l_prob = cs.lPoly.prob
+      self.l_isSolid = cs.lPoly.isSolid
+      self.l_isDashed = cs.lPoly.isDashed
+    else:
+      self.l_poly = np.array([0., 0., 0., 0.])
+      self.l_prob = 0.
+      self.l_isSolid = False
+      self.l_isDashed = False
+    if self.op_params.get('enable_right_lane'):
+      self.r_poly = np.array([cs.rPoly.c0,cs.rPoly.c1,cs.rPoly.c2,cs.rPoly.c3])
+      self.r_prob = cs.rPoly.prob
+      self.r_isSolid = cs.rPoly.isSolid
+      self.r_isDashed = cs.rPoly.isDashed
+    else:
+      self.r_poly = np.array([0., 0., 0., 0.])
+      self.r_prob = 0.
+      self.r_isSolid = False
+      self.r_isDashed = False
     self.p_poly = np.array([.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))]) # take the middle of the lane lines as the desired path
-    self.l_prob = cs.lPoly.prob
-    self.r_prob = cs.rPoly.prob
 
-    self.l_isSolid = cs.lPoly.isSolid
-    self.l_isDashed = cs.lPoly.isDashed
-    self.r_isSolid = cs.rPoly.isSolid
-    self.r_isDashed = cs.rPoly.isDashed
 
     if len(md.meta.desirePrediction):
       self.l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]
@@ -99,9 +119,9 @@ class LanePlanner():
     # freeway exit filtering, does not handle when both lines are solid
     if abs(self.l_poly[2] - self.r_poly[2]) > EXIT_FILTER_C2 or abs(self.l_poly[1] - self.r_poly[1]) > EXIT_FILTER_C1:
       if self.l_isSolid and self.r_prob > .10:
-        self.l_prob = 0
+        self.l_prob = 0.
       elif self.r_isSolid and self.l_prob > .10:
-        self.r_prob = 0
+        self.r_prob = 0.
 
     # exponentially-smoothed lane width estimate
     if self.exeCtr == 0:
