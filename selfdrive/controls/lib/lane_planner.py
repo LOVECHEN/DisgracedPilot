@@ -8,6 +8,7 @@ LANE_WIDTH_K = np.exp(-.25 / 60) # decay factor for exponential smoothing, reach
 LANE_WIDTH_FACTOR = 1.0 # scaling factor to manipulate apparent lane width
 EXIT_FILTER_C1 = .0003 # exit filter curvature difference threshold
 EXIT_FILTER_C2 = .02 # exit filter angle difference threshold
+EXIT_FILTER_C3 = .05 # exit filter lane width threshold
 
 def compute_path_pinv(l=50):
   deg = 3
@@ -22,7 +23,7 @@ def model_polyfit(points, path_pinv):
 
 
 def calc_d_poly(l_poly, r_poly, p_poly, l_prob, r_prob, lane_width):
-  # This will improve behaviour when lanes suddenly drop out
+  # This will improve behaviour when lanes suddenly widen
   lane_width = min(4.0, lane_width)
   l_prob = l_prob * interp(abs(l_poly[3]), [2, 2.5], [1.0, 0.0])
   r_prob = r_prob * interp(abs(r_poly[3]), [2, 2.5], [1.0, 0.0])
@@ -34,17 +35,8 @@ def calc_d_poly(l_poly, r_poly, p_poly, l_prob, r_prob, lane_width):
 
   lr_prob = l_prob + r_prob - l_prob * r_prob
 
-  if l_prob > .10 and r_prob > .10:
-    d_poly_lane = (l_prob * path_from_left_lane + r_prob * path_from_right_lane) / (l_prob + r_prob + 0.0001)
-    d_poly_out = lr_prob * d_poly_lane + (1.0 - lr_prob) * p_poly
-  elif l_prob < .10 and r_prob < .10:
-    d_poly_out = p_poly
-  elif l_prob < .10:
-    d_poly_out = path_from_right_lane
-  elif r_prob < .10:
-    d_poly_out = path_from_left_lane
-
-  return d_poly_out
+  d_poly_lane = (l_prob * path_from_left_lane + r_prob * path_from_right_lane) / (l_prob + r_prob + 0.0001)
+  return lr_prob * d_poly_lane + (1.0 - lr_prob) * p_poly
 
 
 class LanePlanner():
@@ -88,6 +80,7 @@ class LanePlanner():
       self.l_prob = 0.
       self.l_isSolid = False
       self.l_isDashed = False
+    
     if self.op_params.get('enable_right_lane'):
       self.r_poly = np.array([cs.rPoly.c0,cs.rPoly.c1,cs.rPoly.c2,cs.rPoly.c3])
       self.r_prob = cs.rPoly.prob
@@ -98,8 +91,19 @@ class LanePlanner():
       self.r_prob = 0.
       self.r_isSolid = False
       self.r_isDashed = False
-    self.p_poly = np.array([.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))]) # take the middle of the lane lines as the desired path
-
+    
+    if self.l_prob > .10 and self.r_prob > .10:
+      self.p_poly = np.array([.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))]) # take the middle of the lane lines as the desired path
+    elif self.l_prob < .10 and self.r_prob < .10:
+      self.p_poly = np.array([0., 0., 0., 0.])
+    elif self.l_prob < .10:
+      path_from_right_lane = self.r_poly.copy()
+      path_from_right_lane[3] += self.lane_width / 2.0
+      self.p_poly = path_from_right_lane
+    elif self.r_prob < .10:
+      path_from_left_lane = self.l_poly.copy()
+      path_from_left_lane[3] -= self.lane_width / 2.0
+      self.p_poly = path_from_left_lane
 
     if len(md.meta.desirePrediction):
       self.l_lane_change_prob = md.meta.desirePrediction[log.PathPlan.Desire.laneChangeLeft - 1]
@@ -116,17 +120,17 @@ class LanePlanner():
     self.l_poly[3] += CAMERA_OFFSET
     self.r_poly[3] += CAMERA_OFFSET
 
-    # freeway exit filtering, does not handle when both lines are solid
-    if abs(self.l_poly[2] - self.r_poly[2]) > EXIT_FILTER_C2 or abs(self.l_poly[1] - self.r_poly[1]) > EXIT_FILTER_C1:
-      if self.l_isSolid and self.r_prob > .10:
-        self.l_prob = 0.
-      elif self.r_isSolid and self.l_prob > .10:
-        self.r_prob = 0.
-
     # exponentially-smoothed lane width estimate
     if self.exeCtr == 0:
       if self.l_prob > .10 and self.r_prob > .10:
         self.lane_width = LANE_WIDTH_K * self.lane_width + (1-LANE_WIDTH_K) * LANE_WIDTH_FACTOR * abs(self.l_poly[3] - self.r_poly[3])
+
+    # freeway exit filtering, does not handle when both lines are solid
+    if abs(self.l_poly[2] - self.r_poly[2]) > EXIT_FILTER_C2 or abs(self.l_poly[1] - self.r_poly[1]) > EXIT_FILTER_C1 or abs(self.l_poly[3] - self.r_poly[3]) > (self.lane_width + EXIT_FILTER_C3):
+      if self.l_isSolid and self.r_prob > .10:
+        self.l_prob = 0.
+      elif self.r_isSolid and self.l_prob > .10:
+        self.r_prob = 0.
 
     self.d_poly = calc_d_poly(self.l_poly, self.r_poly, self.p_poly, self.l_prob, self.r_prob, self.lane_width)
 
