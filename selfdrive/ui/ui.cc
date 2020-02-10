@@ -156,6 +156,8 @@ typedef struct UIScene {
 
   int front_box_x, front_box_y, front_box_width, front_box_height;
 
+  bool recording;
+
   uint64_t alert_ts;
   char alert_text1[1024];
   char alert_text2[1024];
@@ -209,6 +211,7 @@ typedef struct UIState {
   SubSocket *controlsstate_sock;
   SubSocket *livecalibration_sock;
   SubSocket *radarstate_sock;
+  SubSocket *livempc_sock;
   SubSocket *map_data_sock;
   SubSocket *uilayout_sock;
   Poller * poller;
@@ -289,6 +292,8 @@ typedef struct UIState {
 
   track_vertices_data track_vertices[2];
 } UIState;
+
+#include "dashcam.h"
 
 static int last_brightness = -1;
 static void set_brightness(UIState *s, int brightness) {
@@ -498,24 +503,27 @@ static void ui_init(UIState *s) {
   pthread_cond_init(&s->bg_cond, NULL);
 
   s->ctx = Context::create();
-  s->model_sock = SubSocket::create(s->ctx, "model");
+  s->model_sock = SubSocket::create(s->ctx, "boschModel");
   s->controlsstate_sock = SubSocket::create(s->ctx, "controlsState");
   s->uilayout_sock = SubSocket::create(s->ctx, "uiLayoutState");
   s->livecalibration_sock = SubSocket::create(s->ctx, "liveCalibration");
   s->radarstate_sock = SubSocket::create(s->ctx, "radarState");
+  s->livempc_sock = SubSocket::create(s->ctx, "liveMpc");
 
   assert(s->model_sock != NULL);
   assert(s->controlsstate_sock != NULL);
   assert(s->uilayout_sock != NULL);
   assert(s->livecalibration_sock != NULL);
   assert(s->radarstate_sock != NULL);
+  assert(s->livempc_sock != NULL);
 
   s->poller = Poller::create({
                               s->model_sock,
                               s->controlsstate_sock,
                               s->uilayout_sock,
                               s->livecalibration_sock,
-                              s->radarstate_sock
+                              s->radarstate_sock,
+                              s->livempc_sock
                              });
 
 #ifdef SHOW_SPEEDLIMIT
@@ -2206,6 +2214,13 @@ int main(int argc, char* argv[]) {
       }
     }
 
+    // awake on any touch
+    int touch_x = -1, touch_y = -1;
+    int touched = touch_poll(&touch, &touch_x, &touch_y, s->awake ? 0 : 100);
+    if (touched == 1) {
+      set_awake(s, true);
+    }
+
     // manage wakefulness
     if (s->awake_timeout > 0) {
       s->awake_timeout--;
@@ -2215,6 +2230,7 @@ int main(int argc, char* argv[]) {
 
     // Don't waste resources on drawing in case screen is off or car is not started.
     if (s->awake && s->vision_connected) {
+      dashcam(s, touch_x, touch_y);
       ui_draw(s);
       glFinish();
       should_swap = true;
