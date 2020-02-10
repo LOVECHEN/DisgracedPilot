@@ -14,7 +14,7 @@ from common.op_params import opParams
 LaneChangeState = log.PathPlan.LaneChangeState
 LaneChangeDirection = log.PathPlan.LaneChangeDirection
 
-LOG_MPC = True
+LOG_MPC = os.environ.get('LOG_MPC', True)
 
 DESIRES = {
   LaneChangeDirection.none: {
@@ -231,6 +231,43 @@ class PathPlanner():
     plan_send.pathPlan.laneChangeDirection = lane_change_direction
 
     pm.send('pathPlan', plan_send)
+
+    # create Bosch model structure to send to UI
+
+    boschModel_send = messaging.new_message()
+    boschModel_send.init('model')
+    boschModel_send.valid = plan_send.valid
+    boschModel_send.model.frameId = sm['model'].frameId
+
+    boschModel_send.model.path.prob = 1.0
+    boschModel_send.model.path.std = .10
+    boschModel_send.model.path.poly = [float(x) for x in self.LP.d_poly]
+    
+    boschModel_send.model.leftLane.prob = float(self.LP.l_prob)
+    boschModel_send.model.leftLane.std = .10
+    boschModel_send.model.leftLane.poly = [float(x) for x in self.LP.l_poly]
+
+    boschModel_send.model.rightLane.prob = float(self.LP.r_prob)
+    boschModel_send.model.rightLane.std = .10
+    boschModel_send.model.rightLane.poly = [float(x) for x in self.LP.r_poly]
+
+    boschModel_send.model.lead.dist = 500.0
+    boschModel_send.model.lead.prob = 0.0
+    boschModel_send.model.lead.std = 100.0
+    boschModel_send.model.lead.relVel = 0.0
+    boschModel_send.model.lead.relVelStd = 100.0
+    boschModel_send.model.lead.relY = 0.0
+    boschModel_send.model.lead.relYStd = 100.0
+    boschModel_send.model.lead.relA = 0.0
+    boschModel_send.model.lead.relAStd = 100.0
+
+    boschModel_send.model.leadFuture = boschModel_send.model.lead
+
+    boschModel_send.model.speed =[50., 50., 50., 50., 50., 50., 50., 50., 50., 50.]
+
+    boschModel_send.model.timestampEof = sm['model'].timestampEof
+
+    pm.send('boschModel', boschModel_send)
 
     if LOG_MPC:
       dat = messaging.new_message()
