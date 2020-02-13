@@ -7,7 +7,7 @@ NO WARRANTY EXPRESSED OR IMPLIED.**
 The 'DisgracedPilot' Fork
 ------
 
-This is an experimental OpenPilot fork that uses the Accord-Bosch camera system to provide lane detection. It is strictly for research purposes only. It aims to show that the vehicle can be controlled using Bosch lane guidance directly off of the CAN, made possible by carefully decoding the raw bit data and producing a custom DBC file. Absolutely no user support will be given. **IMPROPER USE OR ABUSE OF THIS SOFTWARE MAY RESULT IN PROPERTY DAMAGE, INJURY, OR DEATH. ANY APPLICATION OF THIS SOFTWARE IS AT YOUR OWN RISK.** 
+This is an experimental OpenPilot fork that uses the Accord-Bosch camera system to provide lane detection. It is strictly for research purposes only. It only aims to show that the vehicle can be controlled using Bosch lane guidance directly off of the CAN, made possible by carefully decoding the raw bit data and producing a custom DBC file. As a research + test article, absolutely no user-level support will be given. **IMPROPER USE OR ABUSE OF THIS SOFTWARE MAY RESULT IN PROPERTY DAMAGE, INJURY, OR DEATH. ANY APPLICATION OF THIS SOFTWARE IS AT YOUR OWN RISK.** 
 
 The system in action: https://www.youtube.com/watch?v=GB8I9_anNG4
 
@@ -20,10 +20,11 @@ Instructions:
 Known Limitations:
 
  * There are innumerable unknown limitations, behaviours, and interactions that can and will adversely affect system performance.
- * No handling of loss of one or both lane lines. System may be unpredictable in this scenario.
+ * Limited handling of loss of one or both lane lines. System may be unpredictable in this scenario.
  * No handling of lane changes. System tries to return to the centre of the original lane until the lane lines are passed.
  * Steep turns close to the Accord EPS torque limit have unpredictable performance.
- * Controls have not been tuned, resulting in occasional lateral oscillation or overly-aggressive steering.
+ * Controls have only been mildly tuned, resulting in occasional lateral oscillation or overly-aggressive steering.
+ * Bosch lane detection is unreliable near shadows or on rough, poorly-maintained roads.
 
 To do:
 
@@ -34,10 +35,9 @@ To do:
 * Tune the controls and other new logic parameters.
 * Re-purpose various vision and control warnings to be based on the Bosch lane outputs.
 * Lightly smooth lane probabilities to reduce drive path jitter.
-* Show lane and diagnostic information on the UI.
 * Use adjacent lane lines to potentially improve or stabilise lane guidance.
-* Consider new functionality, e.g. using the adjacent lane tracking to create a lane change assistance function; implementing navigation coasting to pass through intersections or deal with brief lane line dropouts; new parameter learner like camera offset.
-* Determine which OpenPilot processes can be disabled and cleanly remove or ignore them.
+* Consider new functionality, e.g. using the adjacent lane tracking to create a lane change assistance function; implementing navigation coasting to pass through intersections or deal with brief lane line dropouts; new parameter learner like camera offset; lead car following in laneless conditions.
+* Determine which OpenPilot processes can be disabled and cleanly remove or ignore them. Particularly need to investigate the necessity of periodic steering angle offset calibration and if necessary, ways to perform one.
 * Investigate running this fork on a Raspberry Pi 4. 
 * Push any universal features to the main line OpenPilot.
 
