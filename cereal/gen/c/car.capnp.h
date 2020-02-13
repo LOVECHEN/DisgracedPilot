@@ -16,6 +16,7 @@ extern "C" {
 
 struct cereal_CarEvent;
 struct cereal_CarState;
+struct cereal_CarState_BoschPoly;
 struct cereal_CarState_WheelSpeeds;
 struct cereal_CarState_CruiseState;
 struct cereal_CarState_ButtonEvent;
@@ -34,6 +35,7 @@ struct cereal_CarParams_CarFw;
 
 typedef struct {capn_ptr p;} cereal_CarEvent_ptr;
 typedef struct {capn_ptr p;} cereal_CarState_ptr;
+typedef struct {capn_ptr p;} cereal_CarState_BoschPoly_ptr;
 typedef struct {capn_ptr p;} cereal_CarState_WheelSpeeds_ptr;
 typedef struct {capn_ptr p;} cereal_CarState_CruiseState_ptr;
 typedef struct {capn_ptr p;} cereal_CarState_ButtonEvent_ptr;
@@ -52,6 +54,7 @@ typedef struct {capn_ptr p;} cereal_CarParams_CarFw_ptr;
 
 typedef struct {capn_ptr p;} cereal_CarEvent_list;
 typedef struct {capn_ptr p;} cereal_CarState_list;
+typedef struct {capn_ptr p;} cereal_CarState_BoschPoly_list;
 typedef struct {capn_ptr p;} cereal_CarState_WheelSpeeds_list;
 typedef struct {capn_ptr p;} cereal_CarState_CruiseState_list;
 typedef struct {capn_ptr p;} cereal_CarState_ButtonEvent_list;
@@ -255,6 +258,10 @@ static const size_t cereal_CarEvent_struct_bytes_count = 8;
 struct cereal_CarState {
 	capn_list16 errorsDEPRECATED;
 	cereal_CarEvent_list events;
+	cereal_CarState_BoschPoly_ptr lPoly;
+	cereal_CarState_BoschPoly_ptr rPoly;
+	cereal_CarState_BoschPoly_ptr lAdjPoly;
+	cereal_CarState_BoschPoly_ptr rAdjPoly;
 	float vEgo;
 	float aEgo;
 	float vEgoRaw;
@@ -289,9 +296,26 @@ struct cereal_CarState {
 
 static const size_t cereal_CarState_word_count = 6;
 
-static const size_t cereal_CarState_pointer_count = 6;
+static const size_t cereal_CarState_pointer_count = 10;
 
-static const size_t cereal_CarState_struct_bytes_count = 96;
+static const size_t cereal_CarState_struct_bytes_count = 128;
+
+struct cereal_CarState_BoschPoly {
+	float c3;
+	float c2;
+	float c1;
+	float c0;
+	float prob;
+	float distVis;
+	unsigned isSolid : 1;
+	unsigned isDashed : 1;
+};
+
+static const size_t cereal_CarState_BoschPoly_word_count = 4;
+
+static const size_t cereal_CarState_BoschPoly_pointer_count = 0;
+
+static const size_t cereal_CarState_BoschPoly_struct_bytes_count = 32;
 
 struct cereal_CarState_WheelSpeeds {
 	float fl;
@@ -558,6 +582,7 @@ static const size_t cereal_CarParams_CarFw_struct_bytes_count = 16;
 
 cereal_CarEvent_ptr cereal_new_CarEvent(struct capn_segment*);
 cereal_CarState_ptr cereal_new_CarState(struct capn_segment*);
+cereal_CarState_BoschPoly_ptr cereal_new_CarState_BoschPoly(struct capn_segment*);
 cereal_CarState_WheelSpeeds_ptr cereal_new_CarState_WheelSpeeds(struct capn_segment*);
 cereal_CarState_CruiseState_ptr cereal_new_CarState_CruiseState(struct capn_segment*);
 cereal_CarState_ButtonEvent_ptr cereal_new_CarState_ButtonEvent(struct capn_segment*);
@@ -576,6 +601,7 @@ cereal_CarParams_CarFw_ptr cereal_new_CarParams_CarFw(struct capn_segment*);
 
 cereal_CarEvent_list cereal_new_CarEvent_list(struct capn_segment*, int len);
 cereal_CarState_list cereal_new_CarState_list(struct capn_segment*, int len);
+cereal_CarState_BoschPoly_list cereal_new_CarState_BoschPoly_list(struct capn_segment*, int len);
 cereal_CarState_WheelSpeeds_list cereal_new_CarState_WheelSpeeds_list(struct capn_segment*, int len);
 cereal_CarState_CruiseState_list cereal_new_CarState_CruiseState_list(struct capn_segment*, int len);
 cereal_CarState_ButtonEvent_list cereal_new_CarState_ButtonEvent_list(struct capn_segment*, int len);
@@ -594,6 +620,7 @@ cereal_CarParams_CarFw_list cereal_new_CarParams_CarFw_list(struct capn_segment*
 
 void cereal_read_CarEvent(struct cereal_CarEvent*, cereal_CarEvent_ptr);
 void cereal_read_CarState(struct cereal_CarState*, cereal_CarState_ptr);
+void cereal_read_CarState_BoschPoly(struct cereal_CarState_BoschPoly*, cereal_CarState_BoschPoly_ptr);
 void cereal_read_CarState_WheelSpeeds(struct cereal_CarState_WheelSpeeds*, cereal_CarState_WheelSpeeds_ptr);
 void cereal_read_CarState_CruiseState(struct cereal_CarState_CruiseState*, cereal_CarState_CruiseState_ptr);
 void cereal_read_CarState_ButtonEvent(struct cereal_CarState_ButtonEvent*, cereal_CarState_ButtonEvent_ptr);
@@ -612,6 +639,7 @@ void cereal_read_CarParams_CarFw(struct cereal_CarParams_CarFw*, cereal_CarParam
 
 void cereal_write_CarEvent(const struct cereal_CarEvent*, cereal_CarEvent_ptr);
 void cereal_write_CarState(const struct cereal_CarState*, cereal_CarState_ptr);
+void cereal_write_CarState_BoschPoly(const struct cereal_CarState_BoschPoly*, cereal_CarState_BoschPoly_ptr);
 void cereal_write_CarState_WheelSpeeds(const struct cereal_CarState_WheelSpeeds*, cereal_CarState_WheelSpeeds_ptr);
 void cereal_write_CarState_CruiseState(const struct cereal_CarState_CruiseState*, cereal_CarState_CruiseState_ptr);
 void cereal_write_CarState_ButtonEvent(const struct cereal_CarState_ButtonEvent*, cereal_CarState_ButtonEvent_ptr);
@@ -630,6 +658,7 @@ void cereal_write_CarParams_CarFw(const struct cereal_CarParams_CarFw*, cereal_C
 
 void cereal_get_CarEvent(struct cereal_CarEvent*, cereal_CarEvent_list, int i);
 void cereal_get_CarState(struct cereal_CarState*, cereal_CarState_list, int i);
+void cereal_get_CarState_BoschPoly(struct cereal_CarState_BoschPoly*, cereal_CarState_BoschPoly_list, int i);
 void cereal_get_CarState_WheelSpeeds(struct cereal_CarState_WheelSpeeds*, cereal_CarState_WheelSpeeds_list, int i);
 void cereal_get_CarState_CruiseState(struct cereal_CarState_CruiseState*, cereal_CarState_CruiseState_list, int i);
 void cereal_get_CarState_ButtonEvent(struct cereal_CarState_ButtonEvent*, cereal_CarState_ButtonEvent_list, int i);
@@ -648,6 +677,7 @@ void cereal_get_CarParams_CarFw(struct cereal_CarParams_CarFw*, cereal_CarParams
 
 void cereal_set_CarEvent(const struct cereal_CarEvent*, cereal_CarEvent_list, int i);
 void cereal_set_CarState(const struct cereal_CarState*, cereal_CarState_list, int i);
+void cereal_set_CarState_BoschPoly(const struct cereal_CarState_BoschPoly*, cereal_CarState_BoschPoly_list, int i);
 void cereal_set_CarState_WheelSpeeds(const struct cereal_CarState_WheelSpeeds*, cereal_CarState_WheelSpeeds_list, int i);
 void cereal_set_CarState_CruiseState(const struct cereal_CarState_CruiseState*, cereal_CarState_CruiseState_list, int i);
 void cereal_set_CarState_ButtonEvent(const struct cereal_CarState_ButtonEvent*, cereal_CarState_ButtonEvent_list, int i);
