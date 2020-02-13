@@ -232,7 +232,7 @@ class PathPlanner():
 
     pm.send('pathPlan', plan_send)
 
-    # create Bosch model structure to send to UI
+    # create Bosch left / right line model structure to send to UI
 
     boschModel_send = messaging.new_message()
     boschModel_send.init('model')
@@ -267,7 +267,32 @@ class PathPlanner():
 
     boschModel_send.model.timestampEof = sm['model'].timestampEof
 
+    # create Bosch left / right adjacent line model structure to send to UI
+
+    boschModel2_send = messaging.new_message()
+    boschModel2_send.init('model')
+    boschModel2_send.valid = plan_send.valid
+    boschModel2_send.model.frameId = sm['model'].frameId
+
+    boschModel2_send.model.path = boschModel_send.model.path
+    
+    boschModel2_send.model.leftLane.prob = float(self.LP.lAdj_prob)
+    boschModel2_send.model.leftLane.std = .10
+    boschModel2_send.model.leftLane.poly = [float(x) for x in self.LP.lAdj_poly]
+
+    boschModel2_send.model.rightLane.prob = float(self.LP.rAdj_prob)
+    boschModel2_send.model.rightLane.std = .10
+    boschModel2_send.model.rightLane.poly = [float(x) for x in self.LP.rAdj_poly]
+
+    boschModel2_send.model.lead = boschModel_send.model.lead
+    boschModel2_send.model.leadFuture = boschModel_send.model.lead
+
+    boschModel2_send.model.speed =[50., 50., 50., 50., 50., 50., 50., 50., 50., 50.]
+
+    boschModel2_send.model.timestampEof = sm['model'].timestampEof
+
     pm.send('boschModel', boschModel_send)
+    pm.send('boschModel2', boschModel2_send)
 
     if LOG_MPC:
       dat = messaging.new_message()
