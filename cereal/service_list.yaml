@@ -81,6 +81,7 @@ testLiveLocation: [8045, false, 0.]
 testJoystick: [8056, false, 0.]
 
 boschModel: [9001, false, 20.]
+boschModel2: [9002, false, 20.]
 
 # 8080 is reserved for slave testing daemon
 # 8762 is reserved for logserver

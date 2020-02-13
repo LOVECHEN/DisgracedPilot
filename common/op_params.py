@@ -44,7 +44,9 @@ class opParams:
                            'srB0': {'default': 0.0, 'allowed_types': [float], 'description': 'Steering angle to begin steering ratio boost', 'live': True},
                            'srB1': {'default': 0.0, 'allowed_types': [float], 'description': 'Steering angle to max out steering ratio boost', 'live': True},
                            'enable_left_lane': {'default': True, 'allowed_types': [bool], 'description': 'Enable / disable left lane tracking for debugging', 'live': True},
-                           'enable_right_lane': {'default': True, 'allowed_types': [bool], 'description': 'Enable / disable right lane tracking for debugging', 'live': True}}
+                           'enable_right_lane': {'default': True, 'allowed_types': [bool], 'description': 'Enable / disable right lane tracking for debugging', 'live': True},
+                           'enable_left_adj_lane': {'default': True, 'allowed_types': [bool], 'description': 'Enable / disable left adjacent lane tracking for debugging', 'live': True},
+                           'enable_right_adj_lane': {'default': True, 'allowed_types': [bool], 'description': 'Enable / disable right adjacent lane tracking for debugging', 'live': True}}
 
     self.params = {}
     self.params_file = "/data/op_params.json"

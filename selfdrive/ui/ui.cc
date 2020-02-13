@@ -123,6 +123,7 @@ typedef struct UIScene {
   int transformed_width, transformed_height;
 
   ModelData model;
+  ModelData model2;
 
   float mpc_x[50];
   float mpc_y[50];
@@ -208,6 +209,7 @@ typedef struct UIState {
   // Sockets
   Context *ctx;
   SubSocket *model_sock;
+  SubSocket *model2_sock;
   SubSocket *controlsstate_sock;
   SubSocket *livecalibration_sock;
   SubSocket *radarstate_sock;
@@ -288,7 +290,7 @@ typedef struct UIState {
   GLuint frame_vao[2], frame_vbo[2], frame_ibo[2];
   mat4 rear_frame_mat, front_frame_mat;
 
-  model_path_vertices_data model_path_vertices[MODEL_LANE_PATH_CNT * 2];
+  model_path_vertices_data model_path_vertices[MODEL_LANE_PATH_CNT * 4];
 
   track_vertices_data track_vertices[2];
 } UIState;
@@ -504,6 +506,7 @@ static void ui_init(UIState *s) {
 
   s->ctx = Context::create();
   s->model_sock = SubSocket::create(s->ctx, "boschModel");
+  s->model2_sock = SubSocket::create(s->ctx, "boschModel2");
   s->controlsstate_sock = SubSocket::create(s->ctx, "controlsState");
   s->uilayout_sock = SubSocket::create(s->ctx, "uiLayoutState");
   s->livecalibration_sock = SubSocket::create(s->ctx, "liveCalibration");
@@ -511,6 +514,7 @@ static void ui_init(UIState *s) {
   s->livempc_sock = SubSocket::create(s->ctx, "liveMpc");
 
   assert(s->model_sock != NULL);
+  assert(s->model2_sock != NULL);
   assert(s->controlsstate_sock != NULL);
   assert(s->uilayout_sock != NULL);
   assert(s->livecalibration_sock != NULL);
@@ -519,6 +523,7 @@ static void ui_init(UIState *s) {
 
   s->poller = Poller::create({
                               s->model_sock,
+                              s->model2_sock,
                               s->controlsstate_sock,
                               s->uilayout_sock,
                               s->livecalibration_sock,
@@ -1014,6 +1019,8 @@ static void ui_draw_vision_lanes(UIState *s) {
   if(s->model_changed) {
     update_all_lane_lines_data(s, scene->model.left_lane, pvd);
     update_all_lane_lines_data(s, scene->model.right_lane, pvd + MODEL_LANE_PATH_CNT);
+    update_all_lane_lines_data(s, scene->model2.left_lane, pvd + 2 * MODEL_LANE_PATH_CNT);
+    update_all_lane_lines_data(s, scene->model2.right_lane, pvd + 3 * MODEL_LANE_PATH_CNT);
     s->model_changed = false;
   }
   // Draw left lane edge
@@ -1027,6 +1034,18 @@ static void ui_draw_vision_lanes(UIState *s) {
       s, &scene->model.right_lane,
       pvd + MODEL_LANE_PATH_CNT,
       nvgRGBAf(1.0, 1.0, 1.0, scene->model.right_lane.prob));
+
+  // Draw left adjacent lane edge
+  ui_draw_lane(
+      s, &scene->model2.left_lane,
+      pvd + 2 * MODEL_LANE_PATH_CNT,
+      nvgRGBAf(1.0, 1.0, 1.0, scene->model2.left_lane.prob));
+
+  // Draw right adjacent lane edge
+  ui_draw_lane(
+      s, &scene->model2.right_lane,
+      pvd + 3 * MODEL_LANE_PATH_CNT,
+      nvgRGBAf(1.0, 1.0, 1.0, scene->model2.right_lane.prob));
 
   if(s->livempc_or_radarstate_changed) {
     update_all_track_data(s);
@@ -1729,8 +1748,13 @@ void handle_message(UIState *s, Message * msg) {
           capn_to_f32(capn_get32(extrinsicl, i));
     }
   } else if (eventd.which == cereal_Event_model) {
-    s->scene.model = read_model(eventd.model);
-    s->model_changed = true;
+      if (s->model_changed == false) {
+          s->scene.model = read_model(eventd.model);
+          s->model_changed = true;
+      }
+      else {
+          s->scene.model2 = read_model(eventd.model);
+      }   
   } else if (eventd.which == cereal_Event_liveMpc) {
     struct cereal_LiveMpcData datad;
     cereal_read_LiveMpcData(&datad, eventd.liveMpc);

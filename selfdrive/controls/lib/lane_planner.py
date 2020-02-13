@@ -43,6 +43,8 @@ class LanePlanner():
   def __init__(self):
     self.l_poly = [0., 0., 0., 0.]
     self.r_poly = [0., 0., 0., 0.]
+    self.lAdj_poly = [0., 0., 0., 0.]
+    self.rAdj_poly = [0., 0., 0., 0.]
     self.p_poly = [0., 0., 0., 0.]
     self.d_poly = [0., 0., 0., 0.]
 
@@ -50,11 +52,17 @@ class LanePlanner():
 
     self.l_prob = 0.
     self.r_prob = 0.
+    self.lAdj_prob = 0.
+    self.rAdj_prob = 0.
 
     self.l_isSolid = False
     self.l_isDashed = False
     self.r_isSolid = False
     self.r_isDashed = False
+    self.lAdj_isSolid = False
+    self.lAdj_isDashed = False
+    self.rAdj_isSolid = False
+    self.rAdj_isDashed = False
 
     self.l_lane_change_prob = 0.
     self.r_lane_change_prob = 0.
@@ -91,6 +99,28 @@ class LanePlanner():
       self.r_prob = 0.
       self.r_isSolid = False
       self.r_isDashed = False
+
+    if self.op_params.get('enable_left_adj_lane'):
+      self.lAdj_poly = np.array([cs.lAdjPoly.c0,cs.lAdjPoly.c1,cs.lAdjPoly.c2,cs.lAdjPoly.c3])
+      self.lAdj_prob = cs.lAdjPoly.prob
+      self.lAdj_isSolid = cs.lAdjPoly.isSolid
+      self.lAdj_isDashed = cs.lAdjPoly.isDashed
+    else:
+      self.lAdj_poly = np.array([0., 0., 0., 0.])
+      self.lAdj_prob = 0.
+      self.lAdj_isSolid = False
+      self.lAdj_isDashed = False
+
+    if self.op_params.get('enable_right_adj_lane'):
+      self.rAdj_poly = np.array([cs.rAdjPoly.c0,cs.rAdjPoly.c1,cs.rAdjPoly.c2,cs.rAdjPoly.c3])
+      self.rAdj_prob = cs.rAdjPoly.prob
+      self.rAdj_isSolid = cs.rAdjPoly.isSolid
+      self.rAdj_isDashed = cs.rAdjPoly.isDashed
+    else:
+      self.rAdj_poly = np.array([0., 0., 0., 0.])
+      self.rAdj_prob = 0.
+      self.rAdj_isSolid = False
+      self.rAdj_isDashed = False
     
     if self.l_prob > .10 and self.r_prob > .10:
       self.p_poly = np.array([.5*self.l_poly[i]+.5*self.r_poly[i] for i in range(len(self.l_poly))]) # take the middle of the lane lines as the desired path
