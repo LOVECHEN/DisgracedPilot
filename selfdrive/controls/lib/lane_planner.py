@@ -8,7 +8,7 @@ LANE_WIDTH_K = np.exp(-.25 / 60) # decay factor for exponential smoothing, reach
 LANE_WIDTH_FACTOR = 1.0 # scaling factor to manipulate apparent lane width
 EXIT_FILTER_C1 = .0003 # exit filter curvature difference threshold
 EXIT_FILTER_C2 = .02 # exit filter angle difference threshold
-EXIT_FILTER_C3 = .05 # exit filter lane width threshold
+EXIT_FILTER_C3 = .10 # exit filter lane width threshold
 
 def compute_path_pinv(l=50):
   deg = 3
