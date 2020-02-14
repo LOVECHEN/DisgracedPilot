@@ -14,13 +14,15 @@ The system in action: https://www.youtube.com/watch?v=GB8I9_anNG4
 Instructions:
 
 * Load code onto the EON.
-* SSH into the EON and run 'scons' in the ~/openpilot folder. (May take one hour or more.)
-* Copy LiveParameters from another fork into the ~/data/params folder.
+* SSH into the EON and run 'scons' in the /data/openpilot folder. (May take one hour or more.)
+* Copy LiveParameters from another fork into the /data/params folder, or use the existing one if it is valid.
+* Remove any old instances of op_params.json or kegman.json in /data/.
+* After rebooting, in /data/openpilot, tune parameters as desired using op_tune.py.
 
 Known Limitations:
 
  * There are innumerable unknown limitations, behaviours, and interactions that can and will adversely affect system performance.
- * Limited handling of loss of one or both lane lines. System may be unpredictable in this scenario.
+ * Limited handling of loss of one or both lane lines. Bosch system inherently performs poorly when the left and right lane lines are not detected together. System will be unpredictable in this scenario.
  * No handling of lane changes. System tries to return to the centre of the original lane until the lane lines are passed.
  * Steep turns close to the Accord EPS torque limit have unpredictable performance.
  * Controls have only been mildly tuned, resulting in occasional lateral oscillation or overly-aggressive steering.
@@ -28,15 +30,13 @@ Known Limitations:
 
 To do:
 
-* More accurately determine the decoding of the Bosch lane polynomial messages. Particularly need to understand the "LINE_JERK" parameter, as it seems inaccurate or misnamed. Other flags like line colour or slope seem to be present but need to be identified.
+* More accurately determine the decoding of the Bosch lane polynomial messages. Particularly need to understand the "LINE_JERK" parameter, as it seems misidentified. Other flags like line colour or slope seem to be present but need to be identified.
 * Identify the coordinate frame of the Bosch camera. It may be referenced to the rear axle of the vehicle, instead of the camera centre in OpenPilot. The impact may be minimal, however.
 * Investigate model features and deficiencies, e.g. moving from light into shadow, detection of non-line lane boundaries like curbs or grass.
-* Handle common freeway features like lane merging + ending and freeway exits.
 * Tune the controls and other new logic parameters.
-* Re-purpose various vision and control warnings to be based on the Bosch lane outputs.
 * Lightly smooth lane probabilities to reduce drive path jitter.
 * Use adjacent lane lines to potentially improve or stabilise lane guidance.
-* Consider new functionality, e.g. using the adjacent lane tracking to create a lane change assistance function; implementing navigation coasting to pass through intersections or deal with brief lane line dropouts; new parameter learner like camera offset; lead car following in laneless conditions.
+* Consider new functionality, e.g. using the adjacent lane tracking to create a lane change assistance function; implementing navigation coasting to pass through intersections or deal with brief lane line dropouts; new parameter learner for EON camera offset; lead car following in laneless conditions.
 * Determine which OpenPilot processes can be disabled and cleanly remove or ignore them. Particularly need to investigate the necessity of periodic steering angle offset calibration and if necessary, ways to perform one.
 * Investigate running this fork on a Raspberry Pi 4. 
 * Push any universal features to the main line OpenPilot.
