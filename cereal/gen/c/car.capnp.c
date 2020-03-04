@@ -49,18 +49,22 @@ void cereal_set_CarEvent(const struct cereal_CarEvent *s, cereal_CarEvent_list l
 
 cereal_CarState_ptr cereal_new_CarState(struct capn_segment *s) {
 	cereal_CarState_ptr p;
-	p.p = capn_new_struct(s, 48, 6);
+	p.p = capn_new_struct(s, 48, 10);
 	return p;
 }
 cereal_CarState_list cereal_new_CarState_list(struct capn_segment *s, int len) {
 	cereal_CarState_list p;
-	p.p = capn_new_list(s, len, 48, 6);
+	p.p = capn_new_list(s, len, 48, 10);
 	return p;
 }
 void cereal_read_CarState(struct cereal_CarState *s, cereal_CarState_ptr p) {
 	capn_resolve(&p.p);
 	s->errorsDEPRECATED.p = capn_getp(p.p, 0, 0);
 	s->events.p = capn_getp(p.p, 5, 0);
+	s->lPoly.p = capn_getp(p.p, 6, 0);
+	s->rPoly.p = capn_getp(p.p, 7, 0);
+	s->lAdjPoly.p = capn_getp(p.p, 8, 0);
+	s->rAdjPoly.p = capn_getp(p.p, 9, 0);
 	s->vEgo = capn_to_f32(capn_read32(p.p, 0));
 	s->aEgo = capn_to_f32(capn_read32(p.p, 28));
 	s->vEgoRaw = capn_to_f32(capn_read32(p.p, 32));
@@ -96,6 +100,10 @@ void cereal_write_CarState(const struct cereal_CarState *s, cereal_CarState_ptr 
 	capn_resolve(&p.p);
 	capn_setp(p.p, 0, s->errorsDEPRECATED.p);
 	capn_setp(p.p, 5, s->events.p);
+	capn_setp(p.p, 6, s->lPoly.p);
+	capn_setp(p.p, 7, s->rPoly.p);
+	capn_setp(p.p, 8, s->lAdjPoly.p);
+	capn_setp(p.p, 9, s->rAdjPoly.p);
 	capn_write32(p.p, 0, capn_from_f32(s->vEgo));
 	capn_write32(p.p, 28, capn_from_f32(s->aEgo));
 	capn_write32(p.p, 32, capn_from_f32(s->vEgoRaw));
@@ -136,6 +144,49 @@ void cereal_set_CarState(const struct cereal_CarState *s, cereal_CarState_list l
 	cereal_CarState_ptr p;
 	p.p = capn_getp(l.p, i, 0);
 	cereal_write_CarState(s, p);
+}
+
+cereal_CarState_BoschPoly_ptr cereal_new_CarState_BoschPoly(struct capn_segment *s) {
+	cereal_CarState_BoschPoly_ptr p;
+	p.p = capn_new_struct(s, 32, 0);
+	return p;
+}
+cereal_CarState_BoschPoly_list cereal_new_CarState_BoschPoly_list(struct capn_segment *s, int len) {
+	cereal_CarState_BoschPoly_list p;
+	p.p = capn_new_list(s, len, 32, 0);
+	return p;
+}
+void cereal_read_CarState_BoschPoly(struct cereal_CarState_BoschPoly *s, cereal_CarState_BoschPoly_ptr p) {
+	capn_resolve(&p.p);
+	s->c3 = capn_to_f32(capn_read32(p.p, 0));
+	s->c2 = capn_to_f32(capn_read32(p.p, 4));
+	s->c1 = capn_to_f32(capn_read32(p.p, 8));
+	s->c0 = capn_to_f32(capn_read32(p.p, 12));
+	s->prob = capn_to_f32(capn_read32(p.p, 16));
+	s->distVis = capn_to_f32(capn_read32(p.p, 20));
+	s->isSolid = (capn_read8(p.p, 24) & 1) != 0;
+	s->isDashed = (capn_read8(p.p, 24) & 2) != 0;
+}
+void cereal_write_CarState_BoschPoly(const struct cereal_CarState_BoschPoly *s, cereal_CarState_BoschPoly_ptr p) {
+	capn_resolve(&p.p);
+	capn_write32(p.p, 0, capn_from_f32(s->c3));
+	capn_write32(p.p, 4, capn_from_f32(s->c2));
+	capn_write32(p.p, 8, capn_from_f32(s->c1));
+	capn_write32(p.p, 12, capn_from_f32(s->c0));
+	capn_write32(p.p, 16, capn_from_f32(s->prob));
+	capn_write32(p.p, 20, capn_from_f32(s->distVis));
+	capn_write1(p.p, 192, s->isSolid != 0);
+	capn_write1(p.p, 193, s->isDashed != 0);
+}
+void cereal_get_CarState_BoschPoly(struct cereal_CarState_BoschPoly *s, cereal_CarState_BoschPoly_list l, int i) {
+	cereal_CarState_BoschPoly_ptr p;
+	p.p = capn_getp(l.p, i, 0);
+	cereal_read_CarState_BoschPoly(s, p);
+}
+void cereal_set_CarState_BoschPoly(const struct cereal_CarState_BoschPoly *s, cereal_CarState_BoschPoly_list l, int i) {
+	cereal_CarState_BoschPoly_ptr p;
+	p.p = capn_getp(l.p, i, 0);
+	cereal_write_CarState_BoschPoly(s, p);
 }
 
 cereal_CarState_WheelSpeeds_ptr cereal_new_CarState_WheelSpeeds(struct capn_segment *s) {
